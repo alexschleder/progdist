@@ -87,7 +87,7 @@ public class p2pServer
 					}
 				}
 				
-				if (opration.equals("heartbeat") && vars.length > 1) 
+				if (operation.equals("heartbeat") && vars.length > 1) 
 				{
 					System.out.print("\nheartbeat: " + vars[1]);
 					for (int i = 0; i < resourceAddr.size(); i++) 
