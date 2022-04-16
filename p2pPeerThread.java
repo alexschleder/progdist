@@ -45,10 +45,16 @@ public class p2pPeerThread extends Thread {
 				hashTable.put(str, generateFileHash("arquivos\\" + str));
 				// System.out.println("arq: " + str + " Hash: " + generateFileHash("arquivos\\" + str));
 			}
-
 			
 			//Cria uma datagrama para cada arquivo
-			//Envia datagrama
+			for(String key : hashTable.keySet()) {
+				byte[] res = new byte[1024];
+				res = ("create " + key + " " + hashTable.get(key)).getBytes();
+
+				//Envia datagrama
+				DatagramPacket curPacket = new DatagramPacket(res, res.length, addr, 9000);
+				socket.send(curPacket);
+			}	
 		} 
 		catch (IOException e) 
 		{
