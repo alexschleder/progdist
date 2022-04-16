@@ -9,9 +9,10 @@ public class p2pPeerHeartbeat extends Thread {
 	protected byte[] data = new byte[1024];
 	protected int porta;
 
-	public p2pPeerHeartbeat(String[] args) throws IOException {
+	public p2pPeerHeartbeat(String[] args) throws IOException 
+	{
 		String vars[] = args;
-		data = ("heartbeat " + vars[1]).getBytes();
+		data = ("heartbeat " + args[0]).getBytes();
 		addr = InetAddress.getByName(args[0]);
 		porta = Integer.parseInt(args[2]) + 100;
 		// cria um socket datagrama
@@ -40,7 +41,6 @@ public class p2pPeerHeartbeat extends Thread {
 			{
 				//do nothing
 			}
-			System.out.println("\npulse!");
 		}
 	}
 }

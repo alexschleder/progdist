@@ -16,36 +16,47 @@ public class p2pPeerClient extends Thread {
 		socket = new DatagramSocket(port);
 	}
 
-	public void run() {
+	public void run() 
+	{
 		BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
 		String str = "";	
 
-		while (true) {
+		while (true) 
+		{
 
 			System.out.println("\n<list/peer> <message> <ip>");
 			System.out.println("Example: list user <server_ip>");
 			System.out.println("Example: peer \"hello_world!\" <peer_ip> <port>");
-			try {
+			try 
+			{
 				str = obj.readLine();
 				String vars[] = str.split("\\s");
 				addr = InetAddress.getByName(vars[2]);
 				String str2 = vars[0] + " " + vars[1];
 				resource = str2.getBytes();
-				if (vars.length == 4) {
+				if (vars.length == 4) 
+				{
 					System.out.println("Sending message to peer on port " + vars[3]);
 					peer_port = Integer.parseInt(vars[3]);
-				} else {
+				} 
+				else 
+				{
 					peer_port = 9000;
 				}
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 			}
 			
-			try {
+			try 
+			{
 				packet = new DatagramPacket(resource, resource.length, addr, peer_port);
 				socket.send(packet);
 				
-				while (true) {
-					try {
+				while (true) 
+				{
+					try 
+					{
 						// obtem a resposta
 						packet = new DatagramPacket(response, response.length);
 						socket.setSoTimeout(500);
@@ -55,11 +66,15 @@ public class p2pPeerClient extends Thread {
 						String resposta = new String(packet.getData(), 0, packet.getLength());
 						System.out.println("recebido: " + resposta);
 						//Salva o download
-					} catch (IOException e) {
+					} 
+					catch (IOException e) 
+					{
 						break;
 					}
 				}
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 			}
 		}
 	}
