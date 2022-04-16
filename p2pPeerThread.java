@@ -15,12 +15,9 @@ public class p2pPeerThread extends Thread {
 
 	public p2pPeerThread(String[] args) throws IOException {
 		//create <nome_do_recurso> <hash>
-		resource = ("create " + args[1]).getBytes();
 		addr = InetAddress.getByName(args[0]);
-		port = Integer.parseInt(args[2]);
-		// cria um socket datagrama
+		port = Integer.parseInt(args[1]);
 		socket = new DatagramSocket(port);
-		vars = args[1].split("\\s");
 	}
 
 	public void run() 
