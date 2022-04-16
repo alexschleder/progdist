@@ -40,7 +40,7 @@ public class p2pPeerHeartbeat extends Thread {
 			{
 				//do nothing
 			}
-			System.out.println("\npulse!");
+			//System.out.println("\npulse!");
 		}
 	}
 }
