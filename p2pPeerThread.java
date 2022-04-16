@@ -12,6 +12,7 @@ public class p2pPeerThread extends Thread {
 	protected String[] vars;
 
 	public p2pPeerThread(String[] args) throws IOException {
+		//create <nome_do_recurso> <hash>
 		resource = "create " + args[1].getBytes();
 		addr = InetAddress.getByName(args[0]);
 		port = Integer.parseInt(args[2]);
@@ -27,7 +28,10 @@ public class p2pPeerThread extends Thread {
 			//Comunica o recurso para o servidor na porta 9k
 			DatagramPacket packet = new DatagramPacket(resource, resource.length, addr, 9000);
 			socket.send(packet);
-			//TODO: for para mandar todos recursos
+			//TODO: Browse de um diretório
+			//Cria hash para cada arquivo
+			//Cria uma datagrama para cada arquivo
+			//Envia datagrama
 		} catch (IOException e) {
 			socket.close();
 		}
@@ -43,6 +47,7 @@ public class p2pPeerThread extends Thread {
 				// mostra a resposta
 				String data = new String(packet.getData(), 0, packet.getLength());
 				System.out.println("recebido: " + data);
+				//Download do torrent
 				
 			} catch (IOException e) {
 //				if (!vars[0].equals("wait")) {

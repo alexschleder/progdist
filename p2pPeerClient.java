@@ -54,6 +54,7 @@ public class p2pPeerClient extends Thread {
 						// mostra a resposta
 						String resposta = new String(packet.getData(), 0, packet.getLength());
 						System.out.println("recebido: " + resposta);
+						//Salva o download
 					} catch (IOException e) {
 						break;
 					}

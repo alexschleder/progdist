@@ -34,7 +34,7 @@ public class p2pServer {
 				if (vars[0].equals("create") && vars.length > 1) {
 					int j;
 					
-					for (j = 0; j < resourceList.size(); j++) {
+					for (j = 0; j < resour ceList.size(); j++) {
 						if (resourceList.get(j).equals(vars[1]))
 							break;
 					}
