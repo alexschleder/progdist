@@ -2,8 +2,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class p2pServer {
-	public static void main(String[] args) throws IOException {
+public class p2pServer 
+{
+	public static void main(String[] args) throws IOException 
+	{
 		String content = null;
 		InetAddress addr;
 		int port;
@@ -13,15 +15,18 @@ public class p2pServer {
 		DatagramPacket packet;
 		
 		List<String> resourceList = new ArrayList<>();
+		List<String> hashList = new ArrayList<>();
 		List<InetAddress> resourceAddr = new ArrayList<>();
 		List<Integer> resourcePort = new ArrayList<>();
 		List<Integer> timeoutVal = new ArrayList<>();
 		
-		while (true) {
-			try {
+		while (true) 
+		{
+			try 
+			{
 				// recebe datagrama
 				packet = new DatagramPacket(resource, resource.length);
-				socket.setSoTimeout(500);
+				socket.setSoTimeout(1000);
 				socket.receive(packet);
 				System.out.print("Recebi!");
 								
@@ -30,23 +35,32 @@ public class p2pServer {
 				addr = packet.getAddress();
 				port = packet.getPort();
 				String vars[] = content.split("\\s");
+				String operation = vars[0];
+				String resourceName = vars[1];
+				String resourceHash = vars[2];
 				
-				if (vars[0].equals("create") && vars.length > 1) {
+				if (operation.equals("create") && vars.length > 1) 
+				{
 					int j;
 					
-					for (j = 0; j < resourceList.size(); j++) {
+					for (j = 0; j < resourceList.size(); j++) 
+					{
 						if (resourceList.get(j).equals(vars[1]))
 							break;
 					}
 					
-					if (j == resourceList.size()) {
-						resourceList.add(vars[1]);
+					if (j == resourceList.size()) 
+					{
+						resourceList.add(resourceName);
 						resourceAddr.add(addr);
 						resourcePort.add(port);
-						timeoutVal.add(15);		/* 500ms * 15 = 7.5s (enough for 5s heartbeat) */
+						hashList.add(resourceHash);
+						timeoutVal.add(30);		/* 500ms * 15 = 7.5s (enough for 5s heartbeat) */
 						
 						response = "OK".getBytes();
-					} else {
+					} 
+					else 
+					{
 						response = "NOT OK".getBytes();
 					}
 					
@@ -54,7 +68,7 @@ public class p2pServer {
 					socket.send(packet);
 				}
 				
-				if (vars[0].equals("list") && vars.length > 1) 
+				if (operation.equals("list") && vars.length > 1) 
 				{
 					for (int j = 0; j < resourceList.size(); j++) 
 					{
@@ -62,7 +76,7 @@ public class p2pServer {
 						{
 							for (int i = 0; i < resourceList.size(); i++) 
 							{
-								String data = new String(resourceList.get(i) + " " + resourceAddr.get(i).toString() + " " + resourcePort.get(i).toString());
+								String data = new String(resourceList.get(i) + " " + hashList.get(i).toString() + " " + resourceAddr.get(i).toString() + " " + resourcePort.get(i).toString());
 								response = data.getBytes();
 								
 								packet = new DatagramPacket(response, response.length, addr, port);
@@ -73,23 +87,31 @@ public class p2pServer {
 					}
 				}
 				
-				if (vars[0].equals("heartbeat") && vars.length > 1) {
+				if (opration.equals("heartbeat") && vars.length > 1) 
+				{
 					System.out.print("\nheartbeat: " + vars[1]);
-					for (int i = 0; i < resourceList.size(); i++) {
-						if (resourceList.get(i).equals(vars[1]))
-							timeoutVal.set(i, 15);
+					for (int i = 0; i < resourceAddr.size(); i++) 
+					{
+						if (resourceAddr.get(i).equals(vars[1]))
+						{
+							timeoutVal.set(i, 30);
+						}
 					}
 				}
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 				// decrementa os contadores de timeout a cada 500ms (em função do receive com timeout)
 				for (int i = 0; i < timeoutVal.size(); i++) 
 				{
 					timeoutVal.set(i, timeoutVal.get(i) - 1);
-					if (timeoutVal.get(i) == 0) {
+					if (timeoutVal.get(i) == 0) 
+					{
 						System.out.println("\nuser " + resourceList.get(i) + " is dead.");
 						resourceList.remove(i);
 						resourceAddr.remove(i);
 						resourcePort.remove(i);
+						hashList.remove(i);
 						timeoutVal.remove(i);
 					}
 				}
