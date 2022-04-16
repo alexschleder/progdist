@@ -92,7 +92,7 @@ public class p2pServer
 					System.out.print("\nheartbeat: " + vars[1]);
 					for (int i = 0; i < resourceAddr.size(); i++) 
 					{
-						if (resourceAddr.get(i).equals(vars[1]))
+						if (resourceAddr.get(i).equals(addr))
 						{
 							timeoutVal.set(i, 30);
 						}

@@ -12,7 +12,7 @@ public class p2pPeerHeartbeat extends Thread {
 	public p2pPeerHeartbeat(String[] args) throws IOException 
 	{
 		String vars[] = args;
-		data = ("heartbeat " + args[0]).getBytes();
+		data = ("heartbeat " + args[1]).getBytes();
 		addr = InetAddress.getByName(args[0]);
 		porta = Integer.parseInt(args[2]) + 100;
 		// cria um socket datagrama

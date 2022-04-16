@@ -46,7 +46,7 @@ public class p2pPeerThread extends Thread {
 				// obtem a resposta
 				//Espera comunicação de outros peers
 				packet = new DatagramPacket(response, response.length);
-				socket.setSoTimeout(500);
+				socket.setSoTimeout(1000);
 				socket.receive(packet);
 				
 				// mostra a resposta
