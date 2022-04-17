@@ -5,7 +5,7 @@ import java.util.*;
 public class p2pPeer {
 
 	public static void main(String[] args) throws IOException {
-		if (args.length != 3) {
+		if (args.length != 2) {
 			System.out.println("Uso: java p2pPeer <server> <localport>");
 			System.out.println("<message> is:");
 			System.out.println("create nickname");

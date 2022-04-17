@@ -32,12 +32,24 @@ public class p2pServer
 								
 				// processa o que foi recebido, adicionando a uma lista
 				content = new String(packet.getData(), 0, packet.getLength());
+				
+				System.out.println(content);
+
 				addr = packet.getAddress();
 				port = packet.getPort();
 				String vars[] = content.split("\\s");
-				String operation = vars[0];
-				String resourceName = vars[1];
-				String resourceHash = vars[2];
+				String operation = "";
+				String resourceName = "";
+				String resourceHash = "";
+				
+				if(vars.length>0) {
+					operation = vars[0];
+					if(vars.length>1) {
+						resourceName = vars[1];
+						if(vars.length>2)
+						resourceHash = vars[2];
+					}
+				}
 				
 				if (operation.equals("create") && vars.length > 1) 
 				{

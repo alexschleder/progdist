@@ -11,7 +11,7 @@ public class p2pPeerClient extends Thread {
 	protected int port, peer_port;
 
 	public p2pPeerClient(String[] args) throws IOException {
-		port = Integer.parseInt(args[2]) + 101;
+		port = Integer.parseInt(args[1]) + 101;
 		socket = new DatagramSocket(port);
 	}
 
