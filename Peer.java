@@ -18,4 +18,16 @@ public class Peer
         this.port = port;
         this.resources = resources;
     }
+
+    public String toString() {
+        String result = "";
+
+        result += address + " " + port + " ->\n";
+
+        for(String key : resources.keySet()) {
+            result += key + "\tHash: " + resources.get(key) + "\n";
+        }
+
+        return result;
+    }
 }
