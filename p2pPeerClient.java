@@ -2,17 +2,22 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class p2pPeerClient extends Thread {
+public class p2pPeerClient extends Thread 
+{
 	protected DatagramSocket socket = null;
 	protected DatagramPacket packet = null;
 	protected InetAddress addr = null;
 	protected byte[] resource = new byte[1024];
 	protected byte[] response = new byte[1024];
 	protected int port, peer_port;
+	/*-------------------------------------*/
+	protected p2pServerInterface serverInterface;
 
-	public p2pPeerClient(String[] args) throws IOException {
+	public p2pPeerClient(String[] args, p2pServerInterface serverIf) throws IOException {
 		port = Integer.parseInt(args[1]) + 101;
 		socket = new DatagramSocket(port);
+
+		serverInterface = serverIf;
 	}
 
 	public void run() 
@@ -28,6 +33,9 @@ public class p2pPeerClient extends Thread {
 			System.out.println("Example: peer \"hello_world!\" <peer_ip> <port>");
 			try 
 			{
+				
+
+
 				str = obj.readLine();
 				String vars[] = str.split("\\s");
 				addr = InetAddress.getByName(vars[2]);

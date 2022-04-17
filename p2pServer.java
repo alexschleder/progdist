@@ -1,134 +1,80 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.LocateRegistry;
 
-public class p2pServer 
+public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 {
+	private volatile ArrayList<Peer> peers;
+
+	public p2pServer() throws RemoteException
+	{
+		peers = new ArrayList<>();
+	}
+
 	public static void main(String[] args) throws IOException 
 	{
-		String content = null;
-		InetAddress addr;
-		int port;
-		byte[] resource = new byte[1024];
-		byte[] response = new byte[1024];
-		DatagramSocket socket = new DatagramSocket(9000);
-		DatagramPacket packet;
-		
-		List<String> resourceList = new ArrayList<>();
-		List<String> hashList = new ArrayList<>();
-		List<InetAddress> resourceAddr = new ArrayList<>();
-		List<Integer> resourcePort = new ArrayList<>();
-		List<Integer> timeoutVal = new ArrayList<>();
-		
-		while (true) 
+		if (args.length != 1) 
 		{
-			try 
-			{
-				// recebe datagrama
-				packet = new DatagramPacket(resource, resource.length);
-				socket.setSoTimeout(1000);
-				socket.receive(packet);
-				System.out.print("Recebi!");
-								
-				// processa o que foi recebido, adicionando a uma lista
-				content = new String(packet.getData(), 0, packet.getLength());
-				
-				System.out.println(content);
+			System.out.println("Usage: java Server <server ip>");
+			System.exit(1);
+		}
 
-				addr = packet.getAddress();
-				port = packet.getPort();
-				String vars[] = content.split("\\s");
-				String operation = "";
-				String resourceName = "";
-				String resourceHash = "";
-				
-				if(vars.length>0) {
-					operation = vars[0];
-					if(vars.length>1) {
-						resourceName = vars[1];
-						if(vars.length>2)
-						resourceHash = vars[2];
+		try 
+		{
+			System.setProperty("java.rmi.server.hostname", args[0]);
+			LocateRegistry.createRegistry(52369);
+			System.out.println("java RMI registry created.");
+		} 
+		catch (RemoteException e) 
+		{
+			System.out.println("java RMI registry already exists.");
+		}
+
+		try 
+		{
+			String server = "rmi://" + args[0] + ":52369/server_if";
+			Naming.rebind(server, new p2pServer());
+			System.out.println("Server is ready.");
+		} 
+		catch (Exception e) 
+		{
+			System.out.println("Serverfailed: " + e);
+		}
+	}
+	
+	public synchronized void heartbeat(InetAddress source) 
+	{
+
+	}
+
+	public synchronized void registerResource(InetAddress source, int port, String resourceName, String resourceHash)
+	{
+		
+	}
+
+	// Retornar lista de peers
+	public synchronized ArrayList<Peer> listResources(String nomeRecurso)
+	{
+		ArrayList<Peer> result = new ArrayList<Peer>();
+
+		for(Peer p : peers) {
+			for(String recurso : p.resources.keySet()) {
+				if(nomeRecurso != null) {
+					if(recurso.contains(nomeRecurso)) {
+						result.add(p);
+						break;
 					}
+				} else {
+					result.add(p);
+					break;
 				}
-				
-				if (operation.equals("create") && vars.length > 1) 
-				{
-					int j;
-					
-					for (j = 0; j < resourceList.size(); j++) 
-					{
-						if (resourceList.get(j).equals(vars[1]))
-							break;
-					}
-					
-					if (j == resourceList.size()) 
-					{
-						resourceList.add(resourceName);
-						resourceAddr.add(addr);
-						resourcePort.add(port);
-						hashList.add(resourceHash);
-						timeoutVal.add(30);		/* 500ms * 15 = 7.5s (enough for 5s heartbeat) */
-						
-						response = "OK".getBytes();
-					} 
-					else 
-					{
-						response = "NOT OK".getBytes();
-					}
-					
-					packet = new DatagramPacket(response, response.length, addr, port);
-					socket.send(packet);
-				}
-				
-				if (operation.equals("list") && vars.length > 1) 
-				{
-					for (int j = 0; j < resourceList.size(); j++) 
-					{
-						if (resourceList.get(j).equals(vars[1])) 
-						{
-							for (int i = 0; i < resourceList.size(); i++) 
-							{
-								String data = new String(resourceList.get(i) + " " + hashList.get(i).toString() + " " + resourceAddr.get(i).toString() + " " + resourcePort.get(i).toString());
-								response = data.getBytes();
-								
-								packet = new DatagramPacket(response, response.length, addr, port);
-								socket.send(packet);
-							}
-							break;
-						}
-					}
-				}
-				
-				if (operation.equals("heartbeat") && vars.length > 1) 
-				{
-					System.out.print("\nheartbeat: " + vars[1]);
-					for (int i = 0; i < resourceAddr.size(); i++) 
-					{
-						if (resourceAddr.get(i).equals(addr))
-						{
-							timeoutVal.set(i, 30);
-						}
-					}
-				}
-			} 
-			catch (IOException e) 
-			{
-				// decrementa os contadores de timeout a cada 500ms (em função do receive com timeout)
-				for (int i = 0; i < timeoutVal.size(); i++) 
-				{
-					timeoutVal.set(i, timeoutVal.get(i) - 1);
-					if (timeoutVal.get(i) == 0) 
-					{
-						System.out.println("\nuser " + resourceList.get(i) + " is dead.");
-						resourceList.remove(i);
-						resourceAddr.remove(i);
-						resourcePort.remove(i);
-						hashList.remove(i);
-						timeoutVal.remove(i);
-					}
-				}
-				System.out.print(".");
 			}
 		}
+
+		return result;
 	}
 }

@@ -13,7 +13,7 @@ public class p2pPeerThread extends Thread {
 	protected int port;
 	protected String[] vars;
 
-	public p2pPeerThread(String[] args) throws IOException {
+	public p2pPeerThread(String[] args, p2pServerInterface serverIf) throws IOException {
 		//create <nome_do_recurso> <hash>
 		addr = InetAddress.getByName(args[0]);
 		port = Integer.parseInt(args[1]);
