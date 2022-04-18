@@ -9,7 +9,7 @@ public class p2pPeerHeartbeat extends Thread {
 	protected byte[] data = new byte[1024];
 	protected int porta;
 
-	public p2pPeerHeartbeat(String[] args) throws IOException 
+	public p2pPeerHeartbeat(String[] args, p2pServerInterface serverIf) throws IOException 
 	{
 		String vars[] = args;
 		data = ("heartbeat").getBytes();

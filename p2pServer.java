@@ -76,9 +76,24 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 		}
 	}
 
-	public synchronized HashMap<InetAddress, String> listResources()
+	// Retornar lista de peers
+	public synchronized ArrayList<Peer> listResources(String nomeRecurso)
 	{
-		HashMap<InetAddress, String> result = new HashMap<InetAddress, String>();
+		ArrayList<Peer> result = new ArrayList<Peer>();
+
+		for(Peer p : peers) {
+			for(String recurso : p.resources.keySet()) {
+				if(nomeRecurso != null) {
+					if(recurso.contains(nomeRecurso)) {
+						result.add(p);
+						break;
+					}
+				} else {
+					result.add(p);
+					break;
+				}
+			}
+		}
 
 		return result;
 	}
