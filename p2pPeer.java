@@ -10,9 +10,6 @@ public class p2pPeer
 		if (args.length != 3) 
 		{
 			System.out.println("Uso: java p2pPeer <server_address> <local_address> <localport>");
-			System.out.println("create nickname");
-			System.out.println("list nickname");
-			System.out.println("wait");
 			return;
 		} 
 

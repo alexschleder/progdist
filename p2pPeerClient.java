@@ -36,9 +36,11 @@ public class p2pPeerClient extends Thread
 		{
 			inputType curType = inputType.INVALID;
 
-			System.out.println("\n<list/peer> <message> <ip>");
-			System.out.println("Example: list user <server_ip>");
-			System.out.println("Example: peer \"hello_world!\" <peer_ip> <port>");
+			System.out.println("\n<list> <search_term>(optional)");
+			System.out.println("\n<peer> <file_name> <peer_ip> <peer_port>");
+			System.out.println("Example: list");
+			System.out.println("Example: list HD");
+			System.out.println("Example: peer file.txt <peer_ip> <port>");
 			try 
 			{
 				str = obj.readLine();
@@ -95,6 +97,7 @@ public class p2pPeerClient extends Thread
 						
 						ByteBuffer fileBuffer = ByteBuffer.allocate(1024);
 						fileBuffer.put(fileResponse.getData());
+						fileBuffer.flip(); // need flip
 						
 						//get file size
 						long fileSize = fileBuffer.getLong();
@@ -105,23 +108,37 @@ public class p2pPeerClient extends Thread
 							fileHash += fileBuffer.getChar();
 						}
 
-						byte[] fileData = new byte[fileBuffer.limit()-fileBuffer.position()];
+						byte[] fileData = new byte[(int)fileSize];
 						int aux = 0;
+						int i = 0;
+						int posicInicialData = fileBuffer.position();
 						//get file data
-						for(int i=fileBuffer.position(); i<fileBuffer.limit(); i++) {
+						for(i = posicInicialData; i<posicInicialData+fileSize; i++) {
+							System.out.println(fileBuffer.position());
 							fileData[aux] = fileBuffer.get();
 							aux++;
+						}
+
+						MessageDigest md = MessageDigest.getInstance("MD5");
+						md.update(fileData);
+						byte[] digest = md.digest();
+						
+						StringBuilder result = new StringBuilder();
+						for (byte aByte : digest) {
+							result.append(String.format("%02X", aByte));
+						}
+
+						System.out.println(result.toString());
+
+						if(result.toString().equals(fileHash)) {
+							System.out.println("File " + vars[1] + " written successfully");
+						} else {
+							System.out.println("File " + vars[1] + " deu cao");
 						}
 
 						//write file
 						writer.write(fileData);
 						writer.close();
-
-						if(generateFileHash(resourceDirectory + "\\" + str).equals(fileHash)) {
-							System.out.println("File " + vars[1] + " written successfully");
-						} else {
-							System.out.println("File " + vars[1] + " deu caô");
-						}
 						break;
 					case INVALID:
 						System.out.println("\tError: Invalid \"" + vars[0] + "\" command\n");
@@ -181,23 +198,5 @@ public class p2pPeerClient extends Thread
 			{
 			}*/
 		}
-	}
-
-	// https://www.baeldung.com/java-md5
-	//
-	// https://mkyong.com/java/java-how-to-convert-bytes-to-hex/
-	// 
-	public String generateFileHash(String fileName) throws NoSuchAlgorithmException, IOException 
-	{			
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		md.update(Files.readAllBytes(Paths.get(fileName)));
-		byte[] digest = md.digest();
-		
-		StringBuilder result = new StringBuilder();
-        for (byte aByte : digest) {
-            result.append(String.format("%02X", aByte));
-        }
-        return result.toString();
-			
 	}
 }

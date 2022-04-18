@@ -76,7 +76,7 @@ public class p2pPeerThread extends Thread {
 				
 				// mostra a resposta
 				String data = new String(packet.getData(), 0, packet.getLength());
-				System.out.println("recebido: " + data);
+				System.out.println("/nfile request: " + data + " requested by " + packet.getAddress());
 				//Envio do arquivo
 				File file = new File(fileDirectory + "/" + data);		
 
