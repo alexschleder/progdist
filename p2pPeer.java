@@ -29,7 +29,6 @@ public class p2pPeer
 		}
 
 		String resourceDirectory = "arquivos";
-		//InetAddress serverAddress = InetAddress.getByName(args[0]);
 		InetAddress localAddress = InetAddress.getByName(args[1]);
 		int port = Integer.parseInt(args[2]);
 

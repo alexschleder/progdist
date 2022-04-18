@@ -9,7 +9,6 @@ import java.security.*;
 public class p2pPeerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected InetAddress addr = null;
-	protected byte[] resource = new byte[1024];
 	protected byte[] response = new byte[1024];
 	protected int port;
 	protected String[] vars;
@@ -38,7 +37,8 @@ public class p2pPeerThread extends Thread {
 			String[] fileList = file.list();
 		
 			//Cria hash para cada arquivo
-			for(String str : fileList) {
+			for(String str : fileList) 
+			{
 				hashTable.put(str, generateFileHash(fileDirectory + "\\" + str));
 				// System.out.println("arq: " + str + " Hash: " + generateFileHash("arquivos\\" + str));
 			}

@@ -4,10 +4,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 public class p2pPeerHeartbeat extends Thread {
-	protected DatagramSocket socket = null;
-	protected DatagramPacket packet = null;
 	protected InetAddress localAddress = null;
-	protected byte[] data = new byte[1024];
 	protected int port;
 	p2pServerInterface serverIf;
 

@@ -2,7 +2,6 @@ import java.io.*;
 import java.nio.*;
 import java.net.*;
 import java.util.*;
-import java.nio.file.*;
 import java.security.*;
 
 public class p2pPeerClient extends Thread 
