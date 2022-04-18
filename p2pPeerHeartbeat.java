@@ -25,7 +25,7 @@ public class p2pPeerHeartbeat extends Thread {
 			try 
 			{
 				serverIf.heartbeat(localAddress, port);
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 			} 
 			catch(InterruptedException e) 
 			{
