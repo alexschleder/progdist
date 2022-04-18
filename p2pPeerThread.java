@@ -15,11 +15,11 @@ public class p2pPeerThread extends Thread {
 	p2pServerInterface serverInterface;
 	String fileDirectory;
 
-	public p2pPeerThread(String[] args, p2pServerInterface serverInterface) throws IOException 
+	public p2pPeerThread(InetAddress localAddress, int port, p2pServerInterface serverInterface) throws IOException 
 	{
 		//create <nome_do_recurso> <hash>
-		addr = InetAddress.getByName(args[0]);
-		port = Integer.parseInt(args[1]);
+		addr = localAddress;
+		this.port = port;
 		socket = new DatagramSocket(port);
 		this.serverInterface = serverInterface;
 		fileDirectory = "arquivos";

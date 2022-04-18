@@ -4,9 +4,9 @@ import java.util.*;
 
 public class p2pServerTimer extends Thread
 {
-    private HashMap<InetAddress, LocalDateTime> timers;
+    private HashMap<Peer, LocalDateTime> timers;
     private ArrayList<Peer> peers;
-    public p2pServerTimer(HashMap<InetAddress, LocalDateTime> timers, ArrayList<Peer> peers)
+    public p2pServerTimer(HashMap<Peer, LocalDateTime> timers, ArrayList<Peer> peers)
     {
         this.timers = timers;
         this.peers = peers;
@@ -16,20 +16,13 @@ public class p2pServerTimer extends Thread
     {
         while (true)
         {
-            for (InetAddress peerAddress : timers.keySet())
+            for (Peer peer : timers.keySet())
             {
-                if (timers.get(peerAddress).isBefore(LocalDateTime.now().minusSeconds(30)))
+                if (timers.get(peer).isBefore(LocalDateTime.now().minusSeconds(30)))
                 {
-                    System.out.println(peerAddress + " timed out");
-                    timers.remove(peerAddress);
-                    for (Peer p : peers)
-                    {
-                        if (p.address.equals(peerAddress))
-                        {
-                            peers.remove(p);
-                            break;
-                        }
-                    }
+                    System.out.println(peer + " timed out");
+                    timers.remove(peer);
+                    peers.remove(peer);
                 }
             }
 

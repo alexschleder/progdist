@@ -14,8 +14,9 @@ public class p2pPeerClient extends Thread
 	protected p2pServerInterface serverInterface;
 	protected String resourceDirectory;
 
-	public p2pPeerClient(String[] args, p2pServerInterface serverIf, String resourceDirectory) throws IOException {
-		port = Integer.parseInt(args[1]) + 101;
+	public p2pPeerClient(InetAddress localAddress, int port, p2pServerInterface serverIf, String resourceDirectory) throws IOException {
+		this.port = port + 101;
+		this.addr = localAddress;
 		socket = new DatagramSocket(port);
 		this.resourceDirectory = "arquivos_receive";
 		serverInterface = serverIf;
@@ -82,7 +83,7 @@ public class p2pPeerClient extends Thread
 						socket.send(fileRequest);
 
 
-						DatagramPacket fileResponse = null;
+						DatagramPacket fileResponse = new DatagramPacket(response, response.length);
 						socket.receive(fileResponse);
 
 						String pathToFile = resourceDirectory + "/" + vars[1];

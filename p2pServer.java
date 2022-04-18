@@ -10,7 +10,7 @@ import java.time.*;
 public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 {
 	private volatile ArrayList<Peer> peers;
-	private volatile HashMap<InetAddress, LocalDateTime> timers;
+	private volatile HashMap<Peer, LocalDateTime> timers;
 
 	public p2pServer() throws RemoteException
 	{
@@ -50,12 +50,24 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 		}
 	}
 	
-	public synchronized void heartbeat(InetAddress source) 
+	public synchronized void heartbeat(InetAddress source, int port) 
 	{
 		System.out.println("heartbeat from " + source);
+		Peer currentPeer = null;
+		for (Peer p : peers)
+		{
+			if (p.address.equals(source) && p.port == port)
+			{
+				currentPeer = p;
+			}
+		}
 		try
 		{
-			timers.replace(source, LocalDateTime.now());
+			if (currentPeer == null)
+			{
+				throw (new Exception("peer not found"));
+			}
+			timers.replace(currentPeer, LocalDateTime.now());
 		}
 		catch (Exception e)
 		{
@@ -81,7 +93,7 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 			currentPeer.address = source;
 			currentPeer.port = port;
 			peers.add(currentPeer);
-			timers.put(source, LocalDateTime.now());
+			timers.put(currentPeer, LocalDateTime.now());
 		}
 		
 		if (!currentPeer.resources.containsKey(resourceName))
@@ -99,6 +111,7 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 		ArrayList<String> result = new ArrayList<String>();
 
 		for(Peer p : peers) 
+
 		{
 			for(String recurso : p.resources.keySet()) 
 			{
