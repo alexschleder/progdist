@@ -1,38 +1,37 @@
 import java.io.*;
 import java.nio.file.*;
+import java.rmi.RemoteException;
 import java.net.*;
 import java.util.*;
 import java.security.*;
 
 public class p2pPeerThread extends Thread {
 	protected DatagramSocket socket = null;
-	protected DatagramPacket packet = null;
 	protected InetAddress addr = null;
 	protected byte[] resource = new byte[1024];
 	protected byte[] response = new byte[1024];
 	protected int port;
 	protected String[] vars;
+	p2pServerInterface serverInterface;
+	String fileDirectory;
 
-	public p2pPeerThread(String[] args) throws IOException {
+	public p2pPeerThread(String[] args, p2pServerInterface serverInterface) throws IOException {
 		//create <nome_do_recurso> <hash>
 		addr = InetAddress.getByName(args[0]);
 		port = Integer.parseInt(args[1]);
 		socket = new DatagramSocket(port);
+		this.serverInterface = serverInterface;
+		fileDirectory = "arquivos";
 	}
 
 	public void run() 
 	{
 		try 
-		{
-			// envia um packet
-			//Comunica o recurso para o servidor na porta 9k
-			DatagramPacket packet = new DatagramPacket(resource, resource.length, addr, 9000);
-			socket.send(packet);
-			
+		{			
 			//-=-= Criar hash para cada arquivo =-=-
 			
 			// Todos arquivos na pasta "arquivos"
-			File file = new File("arquivos");
+			File file = new File(fileDirectory);
 			String[] fileList = file.list();
 		
 			//Cria hash para cada arquivo
@@ -44,20 +43,24 @@ public class p2pPeerThread extends Thread {
 			}
 			
 			//Cria uma datagrama para cada arquivo
-			for(String key : hashTable.keySet()) {
-				byte[] res = new byte[1024];
-				res = ("create " + key + " " + hashTable.get(key)).getBytes();
-
-				//Envia datagrama
-				DatagramPacket curPacket = new DatagramPacket(res, res.length, addr, 9000);
-				socket.send(curPacket);
+			for(String key : hashTable.keySet()) 
+			{
+				serverInterface.registerResource(addr, port, key, hashTable.get(key));
 			}	
-		} 
+		}
+			
+		catch(RemoteException e)
+		{
+			e.printStackTrace();
+		}
+
 		catch (IOException e) 
 		{
-			socket.close();
-		} catch (NoSuchAlgorithmException e) {
-			socket.close();
+			e.printStackTrace();
+		} 
+		catch (NoSuchAlgorithmException e) 
+		{
+			e.printStackTrace();
 		}
 		
 		while (true) 
@@ -66,16 +69,25 @@ public class p2pPeerThread extends Thread {
 			{
 				// obtem a resposta
 				//Espera comunicação de outros peers
-				packet = new DatagramPacket(response, response.length);
-				socket.setSoTimeout(1000);
+				DatagramPacket packet = new DatagramPacket(response, response.length);
+				socket.setSoTimeout(500);
 				socket.receive(packet);
 				
 				// mostra a resposta
 				String data = new String(packet.getData(), 0, packet.getLength());
 				System.out.println("recebido: " + data);
-				//Download do torrent
-				
+				//Envio do arquivo
+				File file = new File(fileDirectory + "/" + data);		
+
+				byte[] fileToSend = Files.readAllBytes(file.toPath());
+
+				socket.send(new DatagramPacket(fileToSend, fileToSend.length, packet.getAddress(), packet.getPort()));
+			}
+			catch (FileNotFoundException e)
+			{
+				System.out.println("Requested file does not exist");
 			} 
+
 			catch (IOException e) 
 			{
 //				if (!vars[0].equals("wait")) {
@@ -93,10 +105,8 @@ public class p2pPeerThread extends Thread {
 	//
 	// https://mkyong.com/java/java-how-to-convert-bytes-to-hex/
 	// 
-	public String generateFileHash(String fileName) throws NoSuchAlgorithmException, IOException {
-		//String filename = "src/test/resources/test_md5.txt";
-		//String checksum = "5EB63BBBE01EEED093CB22BB8F5ACDC3";
-			
+	public String generateFileHash(String fileName) throws NoSuchAlgorithmException, IOException 
+	{			
 		MessageDigest md = MessageDigest.getInstance("MD5");
 		md.update(Files.readAllBytes(Paths.get(fileName)));
 		byte[] digest = md.digest();
@@ -107,6 +117,5 @@ public class p2pPeerThread extends Thread {
         }
         return result.toString();
 			
-		//assertThat(result.equals(checksum)).isTrue();
 	}
 }

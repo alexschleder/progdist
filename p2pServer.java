@@ -53,8 +53,29 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 
 	public synchronized void registerResource(InetAddress source, int port, String resourceName, String resourceHash)
 	{
+		Peer currentPeer = null;
+		for (Peer p : peers)
+		{
+			if (p.address.equals(source))
+			{
+				currentPeer = p;
+			}
+		}
+
+		if (currentPeer == null)
+		{
+			currentPeer = new Peer();
+			currentPeer.address = source;
+			currentPeer.port = port;
+			peers.add(currentPeer);
+		}
 		
+		if (!currentPeer.resources.containsKey(resourceName))
+		{
+			currentPeer.resources.put(resourceName, resourceHash);
+		}
 	}
+
 	public synchronized HashMap<InetAddress, String> listResources()
 	{
 		HashMap<InetAddress, String> result = new HashMap<InetAddress, String>();
