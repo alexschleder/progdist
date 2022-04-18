@@ -16,10 +16,11 @@ public class p2pServerTimer extends Thread
     {
         while (true)
         {
-            for (InetAddress peerAddress : timer.getKeys())
+            for (InetAddress peerAddress : timers.keySet())
             {
                 if (timers.get(peerAddress).isBefore(LocalDateTime.now().minusSeconds(30)))
                 {
+                    System.out.println(peerAddress + " timed out");
                     timers.remove(peerAddress);
                     for (Peer p : peers)
                     {
@@ -32,7 +33,14 @@ public class p2pServerTimer extends Thread
                 }
             }
 
-            Thread.sleep(5000);
+            try
+            {
+                Thread.sleep(5000);
+            }
+            catch (InterruptedException e)
+            {
+                //do nothing
+            }
         }
     }
 }

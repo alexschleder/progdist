@@ -1,19 +1,12 @@
 import java.io.*;
-import java.net.*;
-import java.util.*;
-
 import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.util.*;
-
 
 public class p2pPeer 
 {
 
 	public static void main(String[] args) throws IOException 
 	{
-		if (args.length != 3) 
+		if (args.length != 2) 
 		{
 			System.out.println("Uso: java p2pPeer <server> <localport>");
 			System.out.println("create nickname");
@@ -21,7 +14,6 @@ public class p2pPeer
 			System.out.println("wait");
 			return;
 		} 
-		int result = 0;
 
 		String remoteHostName = args[0];
 		String connectLocation = "rmi://" + remoteHostName + ":52369/server_if";
@@ -38,8 +30,9 @@ public class p2pPeer
 			e.printStackTrace();
 		}
 
+		String resourceDirectory = "arquivos";
 		new p2pPeerThread(args, serverIf).start();
 		new p2pPeerHeartbeat(args, serverIf).start();
-		new p2pPeerClient(args, serverIf).start();
+		new p2pPeerClient(args, serverIf, resourceDirectory).start();
 	}
 }

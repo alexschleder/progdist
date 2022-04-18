@@ -16,11 +16,11 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 	{
 		peers = new ArrayList<>();
 		timers = new HashMap<>();
+		new p2pServerTimer(timers, peers).start();
 	}
 
 	public static void main(String[] args) throws IOException 
 	{
-		new p2pServerTimer(timers, peers).start();
 		if (args.length != 1) 
 		{
 			System.out.println("Usage: java Server <server ip>");
@@ -52,9 +52,10 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 	
 	public synchronized void heartbeat(InetAddress source) 
 	{
+		System.out.println("heartbeat from " + source);
 		try
 		{
-			lastUpdate.replace(source, LocalDateTime.now());
+			timers.replace(source, LocalDateTime.now());
 		}
 		catch (Exception e)
 		{
@@ -64,10 +65,11 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 
 	public synchronized void registerResource(InetAddress source, int port, String resourceName, String resourceHash)
 	{
+		System.out.println("Resource " + resourceName + " from " + source + " on port " + port + " with hash " + resourceHash);
 		Peer currentPeer = null;
 		for (Peer p : peers)
 		{
-			if (p.address.equals(source))
+			if (p.address.equals(source) && p.port == port)
 			{
 				currentPeer = p;
 			}
@@ -79,34 +81,43 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 			currentPeer.address = source;
 			currentPeer.port = port;
 			peers.add(currentPeer);
-			lastUpdate.put(source, LocalDateTime.now());
+			timers.put(source, LocalDateTime.now());
 		}
 		
 		if (!currentPeer.resources.containsKey(resourceName))
 		{
 			currentPeer.resources.put(resourceName, resourceHash);
 		}
+		
+		System.out.println(peers);
 	}
 
 	// Retornar lista de peers
-	public synchronized ArrayList<Peer> listResources(String nomeRecurso)
+	public synchronized ArrayList<String> listResources(String nomeRecurso)
 	{
-		ArrayList<Peer> result = new ArrayList<Peer>();
+		System.out.println("Resource list request received");
+		ArrayList<String> result = new ArrayList<String>();
 
-		for(Peer p : peers) {
-			for(String recurso : p.resources.keySet()) {
+		for(Peer p : peers) 
+		{
+			for(String recurso : p.resources.keySet()) 
+			{
 				if(nomeRecurso != null) {
-					if(recurso.contains(nomeRecurso)) {
-						result.add(p);
+					if(recurso.contains(nomeRecurso)) 
+					{
+						result.add(p.toString());
 						break;
 					}
-				} else {
-					result.add(p);
+				} 
+				else
+				{
+					result.add(p.toString());
 					break;
 				}
 			}
 		}
 
+		System.out.println(result);
 		return result;
 	}
 }

@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.net.*;
 import java.util.HashMap;
 
@@ -9,7 +10,7 @@ public class Peer
 
     public Peer()
     {
-        
+        resources = new HashMap<>();
     }
 
     public Peer(InetAddress address, int port, HashMap<String, String> resources)

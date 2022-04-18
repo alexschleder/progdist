@@ -17,7 +17,7 @@ public class p2pPeerClient extends Thread
 	public p2pPeerClient(String[] args, p2pServerInterface serverIf, String resourceDirectory) throws IOException {
 		port = Integer.parseInt(args[1]) + 101;
 		socket = new DatagramSocket(port);
-		this.resourceDirectory = resourceDirectory;
+		this.resourceDirectory = "arquivos_receive";
 		serverInterface = serverIf;
 	}
 
@@ -42,30 +42,39 @@ public class p2pPeerClient extends Thread
 				str = obj.readLine();
 				String vars[] = str.split("\\s");
 
-				if(vars[0].equals("list")) {
-					if(vars.length == 1) {
+				if(vars[0].equals("list")) 
+				{
+					if(vars.length == 1) 
+					{
 						curType = inputType.LIST;
-					} else {
+					} 
+					else 
+					{
 						curType = inputType.LIST_SEARCH;
 					}
-				} else if(vars[0].equals("peer")) {
+				} 
+				else if(vars[0].equals("peer")) 
+				{
 					curType = inputType.FILE;
 				}
 
-				switch(curType) {
+				switch(curType) 
+				{
 					case LIST:
-						ArrayList<Peer> recursos = serverInterface.listResources(null);
+						ArrayList<String> recursos = serverInterface.listResources(null);
 						System.out.println("-=-=-=-\nResources: \n");
-						for(Peer p : recursos) {
+						System.out.println(recursos);
+						/*for(Peer p : recursos) {
 							System.out.println(p.toString());
-						}
+						}*/
 						break;
 					case LIST_SEARCH:
-						ArrayList<Peer> recursosSearch = serverInterface.listResources(vars[1]);
+						ArrayList<String> recursosSearch = serverInterface.listResources(vars[1]);
 						System.out.println("-=-=-=-\nResources with term \"" + vars[1] + "\": \n");
-						for(Peer p : recursosSearch) {
+						System.out.println(recursosSearch);
+						/*for(Peer p : recursosSearch) {
 							System.out.println(p.toString());
-						}
+						}*/
 						break;
 					case FILE:
 						DatagramPacket fileRequest = new DatagramPacket(vars[1].getBytes(), vars[1].getBytes().length, InetAddress.getByName(vars[2]), Integer.parseInt(vars[3]));
@@ -73,13 +82,12 @@ public class p2pPeerClient extends Thread
 						socket.send(fileRequest);
 
 
-						DatagramPacket fileResponse;
+						DatagramPacket fileResponse = null;
 						socket.receive(fileResponse);
 
 						String pathToFile = resourceDirectory + "/" + vars[1];
 						File toWrite = new File(pathToFile);
 						toWrite.createNewFile();
-						toWrite.close();
 
 						FileOutputStream writer = new FileOutputStream(pathToFile);
 						writer.write(fileResponse.getData());
@@ -106,12 +114,13 @@ public class p2pPeerClient extends Thread
 			} 
 			catch (IOException e) 
 			{
+				e.printStackTrace();
 			}
 			
 			//comentar? colocar if?
-			try 
+			/*try 
 			{
-				packet = new DatagramPacket(resource, resource.length, addr, peer_port);
+				//packet = new DatagramPacket(resource, resource.length, addr, peer_port);
 				socket.send(packet);
 				
 				while (true) 
@@ -136,7 +145,7 @@ public class p2pPeerClient extends Thread
 			} 
 			catch (IOException e) 
 			{
-			}
+			}*/
 		}
 	}
 }
