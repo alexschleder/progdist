@@ -20,7 +20,7 @@ public class p2pServerTimer extends Thread
             {
                 if (timers.get(peer).isBefore(LocalDateTime.now().minusSeconds(30)))
                 {
-                    System.out.println(peer + " timed out");
+                    System.out.println(peer.name() + " timed out");
                     timers.remove(peer);
                     peers.remove(peer);
                 }

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.*;
 import java.nio.file.*;
 import java.rmi.RemoteException;
 import java.net.*;
@@ -27,6 +28,7 @@ public class p2pPeerThread extends Thread {
 
 	public void run() 
 	{
+		HashMap<String,String> hashTable = new HashMap<>();
 		try 
 		{			
 			//-=-= Criar hash para cada arquivo =-=-
@@ -36,10 +38,8 @@ public class p2pPeerThread extends Thread {
 			String[] fileList = file.list();
 		
 			//Cria hash para cada arquivo
-			HashMap<String,String> hashTable = new HashMap<>();
-
 			for(String str : fileList) {
-				hashTable.put(str, generateFileHash("arquivos\\" + str));
+				hashTable.put(str, generateFileHash(fileDirectory + "\\" + str));
 				// System.out.println("arq: " + str + " Hash: " + generateFileHash("arquivos\\" + str));
 			}
 			
@@ -80,9 +80,23 @@ public class p2pPeerThread extends Thread {
 				//Envio do arquivo
 				File file = new File(fileDirectory + "/" + data);		
 
-				byte[] fileToSend = Files.readAllBytes(file.toPath());
+				byte[] fileBytes = Files.readAllBytes(file.toPath());
+				
+				ByteBuffer buffer = ByteBuffer.allocate(1024);
+				// write file length
+				buffer.putLong(file.length());
+				
+				//write file hash
+				for(int i=0; i<hashTable.get(data).length(); i++) {
+					buffer.putChar(hashTable.get(data).charAt(i));
+				}
 
-				socket.send(new DatagramPacket(fileToSend, fileToSend.length, packet.getAddress(), packet.getPort()));
+				//write file data
+				for(int i=0; i<fileBytes.length; i++) {
+					buffer.put(fileBytes[i]);
+				}
+
+				socket.send(new DatagramPacket(buffer.array(), buffer.array().length, packet.getAddress(), packet.getPort()));
 			}
 			catch (FileNotFoundException e)
 			{

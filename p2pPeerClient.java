@@ -1,6 +1,9 @@
 import java.io.*;
+import java.nio.*;
 import java.net.*;
 import java.util.*;
+import java.nio.file.*;
+import java.security.*;
 
 public class p2pPeerClient extends Thread 
 {
@@ -91,8 +94,36 @@ public class p2pPeerClient extends Thread
 						toWrite.createNewFile();
 
 						FileOutputStream writer = new FileOutputStream(pathToFile);
-						writer.write(fileResponse.getData());
+						
+						ByteBuffer fileBuffer = ByteBuffer.allocate(1024);
+						fileBuffer.put(fileResponse.getData());
+						
+						//get file size
+						long fileSize = fileBuffer.getLong();
+						
+						//get file hash
+						String fileHash = "";
+						for(int i=0; i<32; i++) {
+							fileHash += fileBuffer.getChar();
+						}
+
+						byte[] fileData = new byte[fileBuffer.limit()-fileBuffer.position()];
+						int aux = 0;
+						//get file data
+						for(int i=fileBuffer.position(); i<fileBuffer.limit(); i++) {
+							fileData[aux] = fileBuffer.get();
+							aux++;
+						}
+
+						//write file
+						writer.write(fileData);
 						writer.close();
+
+						if(generateFileHash(resourceDirectory + "\\" + str).equals(fileHash)) {
+							System.out.println("File " + vars[1] + " written successfully");
+						} else {
+							System.out.println("File " + vars[1] + " deu caô");
+						}
 						break;
 					case INVALID:
 						System.out.println("\tError: Invalid \"" + vars[0] + "\" command\n");
@@ -114,6 +145,10 @@ public class p2pPeerClient extends Thread
 				}*/
 			} 
 			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+			catch (NoSuchAlgorithmException e)
 			{
 				e.printStackTrace();
 			}
@@ -148,5 +183,23 @@ public class p2pPeerClient extends Thread
 			{
 			}*/
 		}
+	}
+
+	// https://www.baeldung.com/java-md5
+	//
+	// https://mkyong.com/java/java-how-to-convert-bytes-to-hex/
+	// 
+	public String generateFileHash(String fileName) throws NoSuchAlgorithmException, IOException 
+	{			
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		md.update(Files.readAllBytes(Paths.get(fileName)));
+		byte[] digest = md.digest();
+		
+		StringBuilder result = new StringBuilder();
+        for (byte aByte : digest) {
+            result.append(String.format("%02X", aByte));
+        }
+        return result.toString();
+			
 	}
 }

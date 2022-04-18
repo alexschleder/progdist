@@ -20,6 +20,7 @@ public class Peer
         this.resources = resources;
     }
 
+    @Override
     public String toString() {
         String result = "";
 
@@ -30,5 +31,9 @@ public class Peer
         }
 
         return result;
+    }
+
+    public String name() {
+        return address + " on port " + port;
     }
 }
