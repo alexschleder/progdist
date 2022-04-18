@@ -8,7 +8,7 @@ public class p2pPeerClient extends Thread
 {
 	protected DatagramSocket socket = null;
 	protected InetAddress addr = null;
-	protected byte[] response = new byte[1024];
+	protected byte[] response = new byte[32*1024];
 	protected int port;
 	/*-------------------------------------*/
 	protected p2pServerInterface serverInterface;
@@ -94,7 +94,7 @@ public class p2pPeerClient extends Thread
 
 						FileOutputStream writer = new FileOutputStream(pathToFile);
 						
-						ByteBuffer fileBuffer = ByteBuffer.allocate(1024);
+						ByteBuffer fileBuffer = ByteBuffer.allocate(32*1024);
 						fileBuffer.put(fileResponse.getData());
 						fileBuffer.flip(); // need flip
 						
