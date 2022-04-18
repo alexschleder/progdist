@@ -5,18 +5,22 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.LocateRegistry;
+import java.time.*;
 
 public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 {
 	private volatile ArrayList<Peer> peers;
+	private volatile HashMap<InetAddress, LocalDateTime> timers;
 
 	public p2pServer() throws RemoteException
 	{
 		peers = new ArrayList<>();
+		timers = new HashMap<>();
 	}
 
 	public static void main(String[] args) throws IOException 
 	{
+		new p2pServerTimer(timers, peers).start();
 		if (args.length != 1) 
 		{
 			System.out.println("Usage: java Server <server ip>");
@@ -48,7 +52,14 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 	
 	public synchronized void heartbeat(InetAddress source) 
 	{
-
+		try
+		{
+			lastUpdate.replace(source, LocalDateTime.now());
+		}
+		catch (Exception e)
+		{
+			System.out.println("Source for heartbeat does not exist in registered peers");
+		}
 	}
 
 	public synchronized void registerResource(InetAddress source, int port, String resourceName, String resourceHash)
@@ -68,6 +79,7 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 			currentPeer.address = source;
 			currentPeer.port = port;
 			peers.add(currentPeer);
+			lastUpdate.put(source, LocalDateTime.now());
 		}
 		
 		if (!currentPeer.resources.containsKey(resourceName))

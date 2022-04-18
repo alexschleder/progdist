@@ -12,11 +12,12 @@ public class p2pPeerClient extends Thread
 	protected int port, peer_port;
 	/*-------------------------------------*/
 	protected p2pServerInterface serverInterface;
+	protected String resourceDirectory;
 
-	public p2pPeerClient(String[] args, p2pServerInterface serverIf) throws IOException {
+	public p2pPeerClient(String[] args, p2pServerInterface serverIf, String resourceDirectory) throws IOException {
 		port = Integer.parseInt(args[1]) + 101;
 		socket = new DatagramSocket(port);
-
+		this.resourceDirectory = resourceDirectory;
 		serverInterface = serverIf;
 	}
 
@@ -67,7 +68,22 @@ public class p2pPeerClient extends Thread
 						}
 						break;
 					case FILE:
-						//comunicacao entre peers, baixar arquivo
+						DatagramPacket fileRequest = new DatagramPacket(vars[1].getBytes(), vars[1].getBytes().length, InetAddress.getByName(vars[2]), Integer.parseInt(vars[3]));
+						socket.setSoTimeout(10000);
+						socket.send(fileRequest);
+
+
+						DatagramPacket fileResponse;
+						socket.receive(fileResponse);
+
+						String pathToFile = resourceDirectory + "/" + vars[1];
+						File toWrite = new File(pathToFile);
+						toWrite.createNewFile();
+						toWrite.close();
+
+						FileOutputStream writer = new FileOutputStream(pathToFile);
+						writer.write(fileResponse.getData());
+						writer.close();
 						break;
 					case INVALID:
 						System.out.println("\tError: Invalid \"" + vars[0] + "\" command\n");
