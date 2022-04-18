@@ -128,12 +128,12 @@ public class p2pPeerClient extends Thread
 							result.append(String.format("%02X", aByte));
 						}
 
-						System.out.println(result.toString());
+						//System.out.println(result.toString());
 
 						if(result.toString().equals(fileHash)) {
 							System.out.println("File " + vars[1] + " written successfully");
 						} else {
-							System.out.println("File " + vars[1] + " deu cao");
+							System.out.println("File " + vars[1] + " hash check failed");
 						}
 
 						//write file
