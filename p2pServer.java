@@ -52,7 +52,7 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 	
 	public synchronized void heartbeat(InetAddress source, int port) 
 	{
-		System.out.println("heartbeat from " + source);
+		System.out.println("heartbeat from " + source + ":" + port);
 		Peer currentPeer = null;
 		for (Peer p : peers)
 		{

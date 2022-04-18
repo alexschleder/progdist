@@ -5,11 +5,9 @@ import java.util.*;
 public class p2pPeerClient extends Thread 
 {
 	protected DatagramSocket socket = null;
-	protected DatagramPacket packet = null;
 	protected InetAddress addr = null;
-	protected byte[] resource = new byte[1024];
 	protected byte[] response = new byte[1024];
-	protected int port, peer_port;
+	protected int port;
 	/*-------------------------------------*/
 	protected p2pServerInterface serverInterface;
 	protected String resourceDirectory;
@@ -17,7 +15,7 @@ public class p2pPeerClient extends Thread
 	public p2pPeerClient(InetAddress localAddress, int port, p2pServerInterface serverIf, String resourceDirectory) throws IOException {
 		this.port = port + 101;
 		this.addr = localAddress;
-		socket = new DatagramSocket(port);
+		socket = new DatagramSocket(this.port);
 		this.resourceDirectory = "arquivos_receive";
 		serverInterface = serverIf;
 	}
