@@ -76,7 +76,7 @@ public class p2pServer extends UnicastRemoteObject implements p2pServerInterface
 	}
 
 	public synchronized void registerResource(InetAddress source, int port, String resourceName, String resourceHash)
-	{
+	{ 
 		System.out.println("Resource " + resourceName + " from " + source + " on port " + port + " with hash " + resourceHash);
 		Peer currentPeer = null;
 		for (Peer p : peers)

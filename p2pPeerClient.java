@@ -113,7 +113,7 @@ public class p2pPeerClient extends Thread
 						int posicInicialData = fileBuffer.position();
 						//get file data
 						for(i = posicInicialData; i<posicInicialData+fileSize; i++) {
-							System.out.println(fileBuffer.position());
+							//System.out.println(fileBuffer.position());
 							fileData[aux] = fileBuffer.get();
 							aux++;
 						}
