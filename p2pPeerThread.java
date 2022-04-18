@@ -9,7 +9,7 @@ import java.security.*;
 public class p2pPeerThread extends Thread {
 	protected DatagramSocket socket = null;
 	protected InetAddress addr = null;
-	protected byte[] response = new byte[1024];
+	protected byte[] response = new byte[32*1024];
 	protected int port;
 	protected String[] vars;
 	p2pServerInterface serverInterface;
@@ -82,7 +82,7 @@ public class p2pPeerThread extends Thread {
 
 				byte[] fileBytes = Files.readAllBytes(file.toPath());
 				
-				ByteBuffer buffer = ByteBuffer.allocate(1024);
+				ByteBuffer buffer = ByteBuffer.allocate(32*1024);
 				// write file length
 				buffer.putLong(file.length());
 				
